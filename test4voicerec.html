@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microphone Recorder</title>
+</head>
+<body>
+	<a href="test2.html"><img src="party.png"width="500"height="400"alt="partygoer"></a>
+  <h1>Microphone Recorder</h1>
+  <button onclick="startRecording()">Start Recording</button>
+  <button onclick="stopRecording()">Stop Recording</button>
+  <button onclick="downloadAudio()">Download Audio</button>
+  <script>
+    var audioStream;
+    var mediaRecorder;
+    var audioChunks = [];
+
+    function startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+          audioStream = stream;
+          mediaRecorder = new MediaRecorder(audioStream);
+          mediaRecorder.addEventListener("dataavailable", handleAudioData);
+          mediaRecorder.start();
+        });
+    }
+
+    function stopRecording() {
+      mediaRecorder.stop();
+      audioStream.getTracks().forEach(track => track.stop());
+    }
+
+    function handleAudioData(event) {
+      audioChunks.push(event.data);
+    }
+
+    function downloadAudio() {
+  // Create a new Blob object from the audio chunks
+  var audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+
+  // Create a URL for the Blob object
+  var audioURL = URL.createObjectURL(audioBlob);
+
+  // Create a new download link element
+  var downloadLink = document.createElement('a');
+  downloadLink.href = audioURL;
+  downloadLink.target = '_blank';
+  downloadLink.innerHTML = 'Click to download recording';
+
+  // Append the download link to the document body
+  document.body.appendChild(downloadLink);
+}
+  </script>
+</body>
+</html>
